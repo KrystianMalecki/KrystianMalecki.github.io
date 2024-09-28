@@ -102,94 +102,6 @@
         }
         //#endregion
 
-        //#region cookies
-        function _setCookie(cname, cvalue, exdays = 7) {
-            const d = new Date();
-            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-            let expires = "expires=" + d.toUTCString();
-            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-        }
-        function getAllRawCookies() {
-            return document.cookie;
-        }
-
-        //#region map
-        const jsonToken = "jsonToken:"
-        let cookieMap = {};
-
-        function setCookieToMap(name, val, expires = 1) {
-            cookieMap[name] = {
-                type: "extended",
-                name: name,
-                value: val,
-                expires: expires,
-                toSet: true
-            };
-        }
-        function getCookieFromMap(name) {
-            return cookieMap[name];
-        }
-
-        function maybeSimpleCookieToExtendCookie(cookie) {
-            if (typeof cookie == "object"
-                && "type" in cookie
-                && cookie.type == "extended"
-            ) {
-                return cookie;
-            }
-            const trimmed = cookie.trim();
-            let [name, ...rest] = trimmed.split("=");
-            const value = rest.join("=");
-            let index = value.indexOf(jsonToken);
-            if (index == 0) {
-                const jsonText = value.substring(index + jsonToken.length);
-                const obj = JSON.parse(jsonText);
-                return obj;
-            }
-            return simpleCookieToExtendCookie(name, value)
-
-        }
-        function simpleCookieToExtendCookie(name, value) {
-            return {
-                type: "simple",
-                name: name,
-                value: value,
-                expires: null
-            };
-        }
-
-        function getCookieMap() {
-            let cookiesMap = {};
-            let decodedCookie = decodeURIComponent(getAllRawCookies());
-            let cookies = decodedCookie.split(';');
-            cookies.forEach((cookie, i) => {
-                debugger;
-                const betterCookie = maybeSimpleCookieToExtendCookie(cookie);
-                cookiesMap[betterCookie.name] = betterCookie;
-            })
-            return cookiesMap;
-        }
-        function setCookieMap(cookieMap) {
-            const entries = Object.entries(cookieMap);
-            entries.forEach(([key, cookie], i) => {
-                if (key != cookie.name) {
-                    throw new Error("ups" + key + "!=" + cookie.name);
-                }
-                if (cookie?.toSet === true) {
-                    _setCookie(cookie.name, jsonToken + JSON.stringify(cookie), cookie.expires);
-                }
-            });
-        }
-
-        function loadCookieMap() {
-            cookieMap = getCookieMap();
-        }
-        function uploadCookieMap() {
-            setCookieMap(cookieMap)
-        }
-        //#endregion map
-
-        //#endregion cookies
 
         //#region localStorage
         const localStorageKey = "jsTesterPage";
@@ -253,10 +165,10 @@
             codeElement.value = code;
 
         }
-        function setCodeTextFromCookies() {
-            const code = cookieMap["code"];
-            if (code?.value != null) {
-                setCodeText(code.value);
+        function setCodeTextFromStorage() {
+            const code = getFromStorage("code");
+            if (code != null) {
+                setCodeText(code);
             }
         }
         //#endregion
@@ -264,7 +176,7 @@
 
         function deferMain() {
             loadElements();
-            setCodeTextFromCookies();
+            setCodeTextFromStorage();
         }
         function onQuit(e) {
             debugger;
@@ -273,14 +185,12 @@
                 code = "";
                 console.warn("code is null, setting to empty text", code);
             }
-            setCookieToMap("code", code);
+            setToStorage("code", code);
 
-            uploadCookieMap();
         }
 
         addEvent("beforeunload", onQuit)
 
-        loadCookieMap();
     </script>
     <script>
         //element funcs
@@ -313,15 +223,6 @@
     <script defer>
         deferMain();
     </script>
-    <div class="hide">
-        <button onclick="loadCookieMap()">loadCookieMap</button>
-        <button onclick="setCookieToMap('a',Math.random(),7)">setCookieToMap</button>
-        <button onclick="uploadCookieMap()">uploadCookieMap</button>
-        <button onclick="console.log(getCookieToMap('a'))">getCookieToMap</button>
-        <button onclick="console.log(cookieMap)">cookieMap</button>
-
-        <button onclick="console.log(getAllRawCookies())">getAllRawCookies</button>
-    </div>
     <button onclick="onQuit(undefined)">onQuit</button>
 </body>
 
