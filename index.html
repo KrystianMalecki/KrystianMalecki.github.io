@@ -6,20 +6,20 @@
     <title>Document</title>
 </head>
 <body>
-    <script>
+    <script> 
         var count=0;
         function add(){
             count++;
         }
-        function setTo(querySelector, innerHtml){
+        function setTo(querySelector, innerHTML){
             const element = document.querySelector(querySelector);
             if(element==null){
                 console.warn("element is null");
             }else{
-                element.innerHtml = innerHtmll
+                element.innerHTML = innerHTML;
             }
         }
     </script>
-    <button id="clicker" onclick="add();setTo(clicker,count)">click</button>
+    <button id="clicker" onclick="add();setTo('#clicker',count)">click</button>
 </body>
 </html>
