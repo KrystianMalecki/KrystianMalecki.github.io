@@ -178,8 +178,7 @@
             loadElements();
             setCodeTextFromStorage();
         }
-        function onQuit(e) {
-            debugger;
+        function onQuit() {
             let code = getCodeText();
             if (code == null) {
                 code = "";
@@ -211,6 +210,8 @@
     <div class="hide">
         <button class="autoload" id="clicker" onclick="add();setInner('#clicker',count)">click</button>
     </div>
+    (this saves automatically bafore page unload)
+    <button onclick="onQuit(undefined)">force save</button>
     <div class="f pos-rel">
         <textarea style="height:200px" class="autoload w-100-i h-100" id="code"></textarea>
         <button style="right:10px; bottom:10px" class="autoload pos-abs" id="run" onclick="runCodeFunc()">
@@ -223,7 +224,7 @@
     <script defer>
         deferMain();
     </script>
-    <button onclick="onQuit(undefined)">onQuit</button>
+   
 </body>
 
 </html>
